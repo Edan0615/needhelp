@@ -1,0 +1,31 @@
+function create_uuid($prefix = ""){
+      $str = md5(uniqid(mt_rand(), true));  
+      $uuid  = substr($str,0,8) . '-';  
+      $uuid .= substr($str,8,4) . '-';  
+      $uuid .= substr($str,12,4) . '-';  
+      $uuid .= substr($str,16,4) . '-';  
+      $uuid .= substr($str,20,12);  
+      return $prefix . $uuid;
+    }
+    
+    $F_uuid=create_uuid();
+    $header = array(
+      'Content-Type: application/json; charset=UTF-8'
+      , 'X-LINE-ChannelId: 1654188578'
+      , 'X-LINE-ChannelSecret: 043631c94268173e1f63a2431c8326bd'
+    );
+    $postData = array(
+      'productName' => "幫幫幣"
+      , 'amount' => $_POST['quantity']*10
+      , 'currency' => "TWD"
+      , 'confirmUrl' => "localhost/NEEDS/PHP/Include/ADVACTION/PAYMENT/confirm.php"
+      , 'orderId' => "{$F_uuid}"
+    );
+    $ch = curl_init("https://sandbox-api-pay.line.me/v2/payments/request");
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //*curl_setopt($ch, CURLOPT_SSLVERSION, 'CURL_SSLVERSION_TLSv1');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+    $result = json_decode(curl_exec($ch), true);
+    curl_close($ch);
